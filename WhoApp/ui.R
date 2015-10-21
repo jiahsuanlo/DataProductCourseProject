@@ -8,28 +8,24 @@ shinyUI(
         # initial google charts
         googleChartsInit(),
         
-        titlePanel(h2("WHO Indicator Plots")),
+        titlePanel(h2("WHO Health-Related Indicator Plots")),
         
         # ====== fluid row 1 =====
         fluidRow(
             # === column 1 ===
-            shiny::column(width=4,offset=4,
+            shiny::column(width=12, offset= 1,
                 selectInput("var",label= h4("Choose y variable to display:"),
-                            choices= vIndName, 
-                            selected = vIndName[1]),
+                            choices= indicators$name, width= "80%", 
+                            selected = indicators$name[1]),
                
-                sliderInput("year",
-                            label= h4("Year of interest:"),
-                            min= as.integer(minYear), max= as.integer(maxYear), 
-                            value= 2000,step=1,
-                            animate= TRUE)
+                uiOutput("slider")
             )
         ),
         
         # ===== fluid row 2 =====
         fluidRow(
             # === column 1 ===
-            shiny::column(width=12,
+            shiny::column(width=8,
                    googleBubbleChart("chart",
                                   width="100%", height = "475px",
                                   # Set the default options 
@@ -37,7 +33,7 @@ shinyUI(
                                       fontSize = 13,
                                       # Set axis labels and ranges
                                       hAxis = list(title = "Health expenditure, per capita ($USD)"),
-                                      vAxis = list(title = vIndName[1]),
+                                      vAxis = list(title = indicators$name[1]),
                                       
                                       # The default padding is a little too spaced out
                                       chartArea = list(top = 50, left = 75, 
@@ -61,10 +57,16 @@ shinyUI(
                                       )
                                   )
                 )  # google bubble chart
-            ) # column 1
+            ), # column 1
+            
+            # === column 2 ===
+            shiny::column(width=4,
+                          h3(strong("Summary of Regional Average")),
+                          tableOutput("summary")
+                          )
+            
         ) # fluid row 2
         
-        
-           
+      
     )  # end of fluidPage
 )  # end of shinyUI

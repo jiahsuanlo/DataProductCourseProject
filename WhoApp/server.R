@@ -1,4 +1,5 @@
 library(shiny)
+library(lazyeval)
 library(googleCharts)
 
 
@@ -12,37 +13,66 @@ shinyServer(function(input, output) {
         names = levels(data$Region)
     )
     
-    yearData <- reactive({
-        # get y indicator code
-        yCode<- vIndCode[vIndName==input$var]
+    # === calculate min and max year based on the data availability ===
+    # get y indicator code
+    yearRange<- reactive({
+        # get selected y var
+        yCode<- indicators$code[indicators$name==input$var]
         yName<- input$var
+        colNumY<- match(yCode, names(data))
         
+        iExist<- (!is.na(data[,colNumY])) & (!is.na(data$SH.XPD.PCAP))
+        allyear<- data$year[iExist]
+        minYear<- min(allyear)
+        maxYear<- max(allyear)
+        return(c(minYear,maxYear))
+    })
+    
+    # === update slider info ===
+    
+    output$slider<- renderUI({
+        sliderInput("year",
+                label= h4("Year of interest:"),
+                min= yearRange()[1], max= yearRange()[2], 
+                value= yearRange()[1],step=1, width="80%",
+                animate= TRUE)
+    })
+    
+    # === construct google chart data === 
+    
+    yearData <- reactive({
         # Filter to the desired year and desired variables
         # and put the columns in the order that Google's Bubble
         # Chart needs (name, x, y, color, size). Also sort by region
         # so that Google Charts orders and colors the regions
         # consistently.
-        df <- data %>%
-            filter(year == input$year,
-                   (Indicator.Name==input$var)|
-                       (Indicator.Code== "SH.XPD.PCAP")|
-                       (Indicator.Code== "SP.POP.TOTL")) %>%
-            select(Country.Name, Indicator.Code,value,Region) %>%
-            arrange(Region)
         
-        # spread the df
-        dfs <- df %>%
-            spread(Indicator.Code,value) 
-        # form the final df for the google chart (name, x, y, color, size)
-        colNumY<- match(yCode, names(dfs))
-        dfg<- dfs %>%
-            select(Country.Name, SH.XPD.PCAP, 
-                   colNumY ,Region, SP.POP.TOTL)
+        # get selected y var
+        yCode<- indicators$code[indicators$name==input$var]
+        yName<- input$var
+        colNumY<- match(yCode, names(data))
+        
+        if (!is.null(input$year))
+        {
+            df <- data %>%
+                filter(year == input$year) %>%
+                select(Country.Name,SH.XPD.PCAP,colNumY,Region,SP.POP.TOTL) %>%
+                arrange(Region)
+        }
+        else
+        {
+            df <- data %>%
+                filter(year == yearRange()[1]) %>%
+                select(Country.Name,SH.XPD.PCAP,colNumY,Region,SP.POP.TOTL) %>%
+                arrange(Region)
+        }
         # change variable name to the readable ones
-        names(dfg)<- c("Country.Name","Health.Expenditure",yName,"Region","Population")
-        return(dfg)
+        names(df)<- c("Country.Name","Health.Expenditure",yName,"Region","Population")
+        
+        return(df)
     })
     
+    # === update google chart ===
     output$chart <- reactive({
         drawData<- yearData()
         
@@ -76,5 +106,21 @@ shinyServer(function(input, output) {
             )
         )
     })
+    
+   
+    # === update summary table ===
+    output$summary<- renderTable(
+        {
+            drawdata<- yearData()
+            vname<- names(drawdata)[3]
+            
+            tb<- drawdata %>%
+                group_by(Region) %>%
+                summarise_(RegionalMean= interp(~mean(x,na.rm= TRUE),x=as.name(vname))) %>%
+                filter(Region!="")
+            
+            return(tb)
+        }
+    )
     
 })
