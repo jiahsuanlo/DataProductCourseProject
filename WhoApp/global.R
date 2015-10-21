@@ -38,11 +38,9 @@ data0<- data0[,-nc]
 ind<- rawCountry$Region!=""
 rawCountry<- rawCountry[ind,]
 
-# add region column for each country
-data<- merge(data0, rawCountry, by="Country.Code") 
+# add region column for each country+
+data<- left_join(data0, rawCountry)
 data$Region<- factor(data$Region)
-
-
 
 # gather year data
 data<- gather(data, year, value, X1960:X2015)
@@ -53,6 +51,10 @@ data$year <- gsub("^X","",data$year)
 # construct indicator vector
 vIndCode<- unique(data$Indicator.Code)
 vIndName<- unique(data$Indicator.Name)
+# remove expenditure variables
+ind<- (vIndCode!="SH.XPD.PCAP") & (vIndCode!="SP.POP.TOTL")
+vIndCode<- vIndCode[ind]
+vIndName<- vIndName[ind]
 
 # obtain min and max years
 minYear<- min(data$year)

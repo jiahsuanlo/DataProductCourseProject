@@ -9,9 +9,11 @@ shinyUI(
         googleChartsInit(),
         
         titlePanel(h2("WHO Indicator Plots")),
-        sidebarLayout(
-             sidebarPanel(
-                 
+        
+        # ====== fluid row 1 =====
+        fluidRow(
+            # === column 1 ===
+            shiny::column(width=4,offset=4,
                 selectInput("var",label= h4("Choose y variable to display:"),
                             choices= vIndName, 
                             selected = vIndName[1]),
@@ -21,43 +23,32 @@ shinyUI(
                             min= as.integer(minYear), max= as.integer(maxYear), 
                             value= 2000,step=1,
                             animate= TRUE)
-            ),
-            
-           
-            
-            mainPanel ( 
-                googleBubbleChart("chart",
+            )
+        ),
+        
+        # ===== fluid row 2 =====
+        fluidRow(
+            # === column 1 ===
+            shiny::column(width=12,
+                   googleBubbleChart("chart",
                                   width="100%", height = "475px",
-                                  # Set the default options for this chart; they can be
-                                  # overridden in server.R on a per-update basis. See
-                                  # https://developers.google.com/chart/interactive/docs/gallery/bubblechart
-                                  # for option documentation.
-                                  options = list(
-                                      fontName = "Source Sans Pro",
+                                  # Set the default options 
+                                  options = list(fontName = "Source Sans Pro",
                                       fontSize = 13,
                                       # Set axis labels and ranges
-                                      hAxis = list(
-                                          title = "Health expenditure, per capita ($USD)"
-                                          #viewWindow = xlim
-                                      ),
-                                      vAxis = list(
-                                          title = vIndName[1]
-                                          #viewWindow = ylim
-                                      ),
+                                      hAxis = list(title = "Health expenditure, per capita ($USD)"),
+                                      vAxis = list(title = vIndName[1]),
+                                      
                                       # The default padding is a little too spaced out
-                                      chartArea = list(
-                                          top = 50, left = 75,
-                                          height = "75%", width = "75%"
-                                      ),
+                                      chartArea = list(top = 50, left = 75, 
+                                                       right= 75,
+                                          height = "75%", width = "75%"),
                                       # Allow pan/zoom
                                       explorer = list(),
                                       # Set bubble visual props
-                                      bubble = list(
-                                          opacity = 0.4, stroke = "none",
+                                      bubble = list(opacity = 0.4, stroke = "none",
                                           # Hide bubble label
-                                          textStyle = list(
-                                              color = "none"
-                                          )
+                                      textStyle = list(color = "none")
                                       ),
                                       # Set fonts
                                       titleTextStyle = list(
@@ -70,10 +61,8 @@ shinyUI(
                                       )
                                   )
                 )  # google bubble chart
-            ) # main panel
-        ) # sidebar layout
-     
-        
+            ) # column 1
+        ) # fluid row 2
         
         
            
