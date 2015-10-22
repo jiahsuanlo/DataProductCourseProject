@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>The World Bank World Development (Health-Related) Indicator Plotting App</title>
+  <meta charset="utf-8">
+  <meta name="description" content="The World Bank World Development (Health-Related) Indicator Plotting App">
+  <meta name="author" content="JiaHsuan Lo">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/customCSS.css"></link>
+<link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>The World Bank World Development (Health-Related) Indicator Plotting App</h1>
+    <h2>Coursera - Developing Data Products Course Project</h2>
+    <p>JiaHsuan Lo<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Introdution</h2>
+  </hgroup>
+  <article data-timings="">
+    <ol>
+<li>This Shiny App serves as a plotting tool for health-related, World Development Indicator (WDI). </li>
+<li>The WDI data was obtained from:
+
+<ul>
+<li><a href="http://data.worldbank.org/topic/health#tp_wdi">The World Bank World Development Indicators</a></li>
+</ul></li>
+<li>Each indicator data versus health expenditure per capita is illustrated as scattered bubble charts (googleChart).</li>
+</ol>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class codefont" id="id" style="background:;">
+  <hgroup>
+    <h2>Data PreProcessing</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The raw data was in the wide format that indicators were in rows and years were in columns. To make the data easier to work with, data was re-arranged to the long format so that each indicator has its own column...</p></p>
+
+<pre><code class="r">library(dplyr)
+library(tidyr)
+rawdata&lt;- read.csv(&quot;./WDIApp/data/8_Topic_en_csv_v2.csv&quot;,
+                   stringsAsFactors = FALSE, skip=4, sep = &quot;,&quot;,fileEncoding=&quot;UTF-8-BOM&quot;)
+
+# re-arrange data so that each indicator is a column
+cleandata&lt;- rawdata[1:1000,] %&gt;%
+    gather(year,value,X1960:X2015) %&gt;%
+    spread(Indicator.Code, value)
+names(cleandata)[1:10] # show some sample variable names
+</code></pre>
+
+<pre><code>##  [1] &quot;Country.Name&quot;   &quot;Country.Code&quot;   &quot;Indicator.Name&quot; &quot;X&quot;             
+##  [5] &quot;year&quot;           &quot;SG.VAW.ARGU.ZS&quot; &quot;SG.VAW.BURN.ZS&quot; &quot;SG.VAW.GOES.ZS&quot;
+##  [9] &quot;SG.VAW.NEGL.ZS&quot; &quot;SG.VAW.REAS.ZS&quot;
+</code></pre>
+
+<p>So now the indicators are in the columns, and the data is easier to process. </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>How to Launch The App</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The Shiny App can be accessed at the following website <a href="https://jiahsuanlo.shinyapps.io/WDIApp">https://jiahsuanlo.shinyapps.io/WDIApp</a></p>
+
+<p><center> <img src="./assets/img/WDIPic1.png" alt="WDIApp snapshot" width="70%"> </center></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>How to Use the App</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The GUI of the App is illustrated in the following figure</p>
+
+<p><center> <img src="./assets/img/WDIPic2.png" alt="WDIApp GUI" width="70%"> </center></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Summary</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The World Bank World Development (Health-Related) Indicator plotting app provides the following features:</p>
+
+<ol>
+<li>Allowing users to quickly select and show the indicator of interests</li>
+<li>Illustrating the relation between selected indicator and health expenditure</li>
+<li>Demonstrating the difference among countries and regions.</li>
+<li>Showing the trend of selected indicator over time by animating the chart.</li>
+</ol>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Introdution'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Data PreProcessing'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='How to Launch The App'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='How to Use the App'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='Summary'>
+         5
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>

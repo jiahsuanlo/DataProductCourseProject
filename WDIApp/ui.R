@@ -8,7 +8,7 @@ shinyUI(
         # initial google charts
         googleChartsInit(),
         
-        titlePanel(h2("WHO Health-Related Indicator Plots")),
+        titlePanel(h2("The World Bank World Development (Health-Related) Indicator Plots")),
         
         # ====== fluid row 1 =====
         fluidRow(
